@@ -6,7 +6,7 @@ import sys
 sys.path.append("./acllite")
 
 from acllite.acllite_resource import AclLiteResource 
-
+from run_openpose_tf import *
 from processor_2d_3d import ModelProcessor as Processor_2D_to_3D
 from processor_img_2d import ModelProcessor as Processor_Img_to_2D
 from common.pose_decode import body_pose_to_h36
@@ -45,12 +45,13 @@ def run_img_to_2d(model_path, input_video_path):
 
         ret, img_original = cap.read()
     print()
+
     keypoints = np.asarray(keypoints)
     keypoints = body_pose_to_h36(keypoints)
     cap.release()
     
     model_processor.model.destroy()
-
+    
     return keypoints, img_shape, all_frames
 
 

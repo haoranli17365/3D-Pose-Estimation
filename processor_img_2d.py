@@ -4,7 +4,7 @@ import numpy as np
 
 from common.pose_decode import decode_pose
 from acllite.acllite_model import AclLiteModel
-
+import tf_pose.pafprocess.pafprocess as pafprocess
 heatmap_width = 92
 heatmap_height = 92
 
@@ -27,7 +27,6 @@ class ModelProcessor:
 
         # execute model inference
         result = self.model.execute([model_input]) 
-
         # print(result[0].shape)
         # postprocessing: use the heatmaps (the second output of model) to get the joins and limbs for human body
         # Note: the model has multiple outputs, here we used a simplified method, which only uses heatmap for body joints
@@ -38,7 +37,6 @@ class ModelProcessor:
         scale = np.array([img_original.shape[1] / heatmap_width, img_original.shape[0]/ heatmap_height])
 
         canvas, joint_list = decode_pose(heatmaps[0], scale, img_original)
-
         return canvas, joint_list
 
     def preprocess(self,img_original):

@@ -36,7 +36,6 @@ def decode_pose(heatmaps, scale, image_original):
     # obtain joint list from heatmap
     # joint_list: a python list of joints, joint_list[i] is an numpy array with the (x,y) coordinates of the i'th joint (refer to the 'Joints Explained' in this file, e.g., 0th joint is right shoulder)  
     joint_list = [peak_index_to_coords(heatmap)*scale for heatmap in heatmaps]
-    
     # print(joint_list)
     # plot the pose on original image
     canvas = image_original
@@ -44,7 +43,7 @@ def decode_pose(heatmaps, scale, image_original):
         joint_from, joint_to = joint_list[limb[0]], joint_list[limb[1]]
         canvas = cv2.line(canvas, tuple(joint_from.astype(int)), tuple(joint_to.astype(int)), color=COLOR[idx], thickness=4)
     
-    return canvas, joint_list   
+    return canvas, joint_list
 
 
 def peak_index_to_coords(peak_index):

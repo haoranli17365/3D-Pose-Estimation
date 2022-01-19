@@ -28,7 +28,7 @@ atc --input_shape="0:1,243,17,2" --input_format=NCHW --output="model/pose3d_rie_
 ### Sample Run
 ```
 python run.py \
-    --model2D='./model/body_pose.om' \
+    --model2D='./model/OpenPose_light.om' \
     --model3D ./model/pose3d_rie_sim.om \
     --input ./data/pose3d_test_10s.mp4 \
     --output_dir='./outputs'

@@ -19,19 +19,16 @@ atc --framework=3 --model=model/OpenPose_light.pb --input_shape="input001:1,368,
 
 ```
 
-2D to 3D Lifting Model (Pose3D RIE)
+2D to 3D Lifting Model (VideoPose3D)
 ``` 
 # See Release
-wget -nc --no-check-certificate https://github.com/Ascend-Huawei/3DPoseEstimation/releases/download/v0/pose3d_rie_sim.onnx -O model/pose3d_rie_sim.onnx
-
-# Convert
-atc --input_shape="0:1,243,17,2" --input_format=NCHW --output="model/pose3d_rie_sim" --soc_version=Ascend310 --framework=5 --model="model/pose3d_rie_sim.onnx"
+wget -nc --no-check-certificate https://github.com/Ascend-Huawei/3DPoseEstimation/releases/download/v0/video_pose_3d.om -O model/video_pose_3d.om
 ```
 
 ### Sample Run
 ```
 python run.py \
-    --model2D='./model/OpenPose_light.om' \
+    --model2D ./model/video_pose_3d.om \
     --model3D ./model/pose3d_rie_sim.om \
     --input ./data/pose3d_test_10s.mp4 \
     --output_dir='./outputs'

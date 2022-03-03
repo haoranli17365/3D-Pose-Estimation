@@ -12,7 +12,8 @@ from processor_img_2d import ModelProcessor as Processor_Img_to_2D
 from common.pose_decode import body_pose_to_h36
 
 MODEL_IMG_2D_PATH = "model/OpenPose_light.om"
-MODEL_2D_3D_PATH = "model/pose3d_rie_sim.om"
+# MODEL_2D_3D_PATH = "model/pose3d_rie_sim.om"
+MODEL_2D_3D_PATH = "model/video_pose_3d.om"
 INPUT_VIDEO = "data/pose3d_test_10s.mp4"
 
 def run_img_to_2d(model_path, input_video_path):
@@ -48,6 +49,8 @@ def run_img_to_2d(model_path, input_video_path):
     keypoints = body_pose_to_h36(keypoints)
     cap.release()
     
+    model_processor.model.destroy()
+
     return keypoints, img_shape, all_frames
 
 

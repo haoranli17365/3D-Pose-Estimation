@@ -3,7 +3,7 @@ import numpy as np
 
 from acllite.acllite_model import AclLiteModel
 
-from common.generators import Evaluate_Generator
+from common.generators import Evaluate_Generator, UnchunkedGenerator
 from common.quaternion import qrot
 from common.visualization import render_animation
 from common.skeleton import Skeleton
@@ -36,25 +36,28 @@ class ModelProcessor:
 
         prediction = []
         
-        gen = Evaluate_Generator(1, None, None, [model_input], 1,
-                                pad=121, causal_shift=0, augment=True, shuffle=False,
+        # create a slidiing window to create a prediction
+        prediction = np.zeros(shape=(model_input.shape[0], 17, 3))
+        for fr in range(model_input.shape[0] - 10 + 1):
+            cur_kp = np.array(model_input[fr:fr+10, :, :])
+            gen = UnchunkedGenerator(None, None, [cur_kp],
+                                pad=121, causal_shift=0, augment=True,
                                 kps_left=self._kps_left, kps_right=self._kps_right, 
                                 joints_left=self._kps_left, joints_right=self._kps_right)
-        
-        prediction = []
+            _, _, batch_2d = gen.next_epoch()
+            
+            inputs_2d = batch_2d.astype('float32').copy()
+            cur_prediction = np.array(self.model.execute([inputs_2d])[0])
 
-        for _, _, in_2d, in_2d_flip in gen.next_epoch():
-            
-            in_2d = in_2d.astype('float32').copy()
-            pred = self.model.execute([in_2d])[0]
-            
-            # TODO improve using in_2d_flip?
-            
-            prediction.append(pred[0,0].copy())
+            cur_prediction[1, :, :, 0] *= -1
+            cur_prediction[1, :, self._kps_left + self._kps_right] = cur_prediction[1, :, self._kps_right + self._kps_left]
+            cur_prediction = np.mean(cur_prediction, axis=0)
+
+
+            prediction[fr+9, :, :] = cur_prediction[-1, :, :]
+            prediction[fr:fr+10, :, :] = ((prediction[fr:fr+10, :, :] * fr) + cur_prediction) / (fr + 1)
         
-        out = np.array(prediction)
-        
-        return out
+        return prediction
 
     def normalize_screen_coordinates(self, X, w, h): 
         assert X.shape[-1] == 2
@@ -83,7 +86,7 @@ class ModelProcessor:
         input_keypoints = self.image_coordinates(input_keypoints[..., :2], w=self._cam_width, h=self._cam_height)
         
         render_animation(input_keypoints, {'num_joints': 17, 'keypoints_symmetry': [[4, 5, 6, 11, 12, 13], [1, 2, 3, 14, 15, 16]]}, anim_output,
-                         self._h36m_skeleton, None, 3000, 70, output_video_path, (self._cam_width, self._cam_height),
+                         self._h36m_skeleton, 30, 3000, 70, output_video_path, (self._cam_width, self._cam_height),
                          limit=-1, downsample=1, size=6,
                          input_video_path=input_video_path,
                          input_video_skip=0, all_frames=all_frames)

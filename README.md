@@ -28,8 +28,8 @@ wget -nc --no-check-certificate https://github.com/Ascend-Huawei/3DPoseEstimatio
 ### Sample Run
 ```
 python run.py \
-    --model2D ./model/video_pose_3d.om \
-    --model3D ./model/pose3d_rie_sim.om \
-    --input ./data/pose3d_test_10s.mp4 \
+    --model2D ./model/OpenPose_light.om \
+    --model3D ./model/video_pose_3d.om \
+    --input ./data/right_turn.mp4 \
     --output_dir='./outputs'
 ```
